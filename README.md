@@ -21,7 +21,15 @@ Sure! Here's a list of basic to advanced interview questions and answers for ASP
 
 ### 1. What is ASP.NET Core Web API?
 
-ASP.NET Core Web API is a framework for building HTTP-based services using ASP.NET Core. It allows developers to build lightweight and scalable APIs that can be consumed by various clients, such as web applications, mobile apps, or other services. ASP.NET Core Web API follows the RESTful architectural style and supports various features like model binding, content negotiation, and routing.
+ASP.NET Core Web API is a framework that helps developers create services that can communicate over the internet. These services are called APIs (Application Programming Interfaces) and allow different applications and systems to talk to each other.
+
+With ASP.NET Core Web API, developers can build APIs that are lightweight and can handle many requests at once without slowing down. These APIs can be used by different clients, like web applications, mobile apps, or even other services.
+
+The framework follows a set of principles called REST (Representational State Transfer), which is a popular way of designing APIs. This means that the API is designed around resources, which are like objects or pieces of data, and clients can perform operations on these resources, like getting, creating, updating, or deleting them.
+
+ASP.NET Core Web API also provides helpful features for developers. For example, it can automatically convert data between different formats, like JSON or XML, based on what the client wants. It also handles things like understanding the URL structure and directing requests to the correct parts of the code.
+
+Overall, ASP.NET Core Web API is a powerful tool for building services that can communicate over the internet. It makes it easier for different applications and systems to work together by providing a standardized and efficient way of sharing data and functionality.
 
 Sample code:
 
