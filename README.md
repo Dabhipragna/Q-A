@@ -1200,13 +1200,188 @@ The SOLID principles are a set of five design principles that help developers cr
 
 1. **Single Responsibility Principle (SRP):** A class should have only one reason to change, meaning it should have only one responsibility. This principle promotes separation of concerns and helps keep classes focused and maintainable.
 
-2. **Open-Closed Principle (OCP):** Software entities (classes, modules, functions) should be open for extension but closed for modification. This principle encourages designing modules that can be extended without modifying their source code, promoting code reuse and minimizing the impact of changes.
+Here's a sample code example that demonstrates the SOLID principles in C#:
 
-3. **Liskov Substitution Principle (LSP):** Subtypes must be substitutable for their base types. This principle ensures that derived classes can be used interchangeably with their base classes without causing errors or unexpected behavior. It establishes a contract between classes and their clients.
+```csharp
+// Single Responsibility Principle (SRP)
+public class Customer
+{
+    public void AddCustomer(string name)
+    {
+        // Code for adding a new customer to the database
+    }
 
-4. **Interface Segregation Principle (ISP):** Clients should not be forced to depend on interfaces they do not use. This principle promotes the idea of segregating interfaces into smaller, focused ones, tailored to the needs of clients. It helps prevent bloated interfaces and reduces coupling between components.
+    public void UpdateCustomer(string customerId)
+    {
+        // Code for updating customer information in the database
+    }
 
-5. **Dependency Inversion Principle (DIP):** High-level modules should not depend on low-level modules; both should depend on abstractions. Abstractions should not depend on details; details should depend on abstractions. This principle promotes loose coupling by inverting the traditional dependency relationships.
+    public void DeleteCustomer(string customerId)
+    {
+        // Code for deleting a customer from the database
+    }
+}
+
+```
+
+- Single Responsibility Principle (SRP): The `Customer` class has separate methods for adding, updating, and deleting customers, focusing on a single responsibility of customer management.
+
+3. **Open-Closed Principle (OCP):** Software entities (classes, modules, functions) should be open for extension but closed for modification. This principle encourages designing modules that can be extended without modifying their source code, promoting code reuse and minimizing the impact of changes.
+
+Here's a sample code example that demonstrates the SOLID principles in C#:
+
+```csharp
+
+// Open-Closed Principle (OCP)
+public abstract class Shape
+{
+    public abstract double CalculateArea();
+}
+
+public class Rectangle : Shape
+{
+    public double Width { get; set; }
+    public double Height { get; set; }
+
+    public override double CalculateArea()
+    {
+        return Width * Height;
+    }
+}
+
+public class Circle : Shape
+{
+    public double Radius { get; set; }
+
+    public override double CalculateArea()
+    {
+        return Math.PI * Radius * Radius;
+    }
+}
+
+```
+
+- Open-Closed Principle (OCP): The `Shape` class is designed to be extended by specific shapes like `Rectangle` and `Circle` without modifying the `Shape` class itself. Each shape implements the `CalculateArea` method to provide its own area calculation logic.
+
+5. **Liskov Substitution Principle (LSP):** Subtypes must be substitutable for their base types. This principle ensures that derived classes can be used interchangeably with their base classes without causing errors or unexpected behavior. It establishes a contract between classes and their clients.
+
+Here's a sample code example that demonstrates the SOLID principles in C#:
+
+```csharp
+// Liskov Substitution Principle (LSP)
+public class Animal
+{
+    public virtual string MakeSound()
+    {
+        return "Animal makes a sound";
+    }
+}
+
+public class Dog : Animal
+{
+    public override string MakeSound()
+    {
+        return "Woof!";
+    }
+}
+
+```
+
+- Liskov Substitution Principle (LSP): The `Animal` class is a base class that can be overridden by derived classes like `Dog`. The `MakeSound` method is declared in the base class and overridden in the derived class, ensuring that a derived class can be used interchangeably with the base class.
+
+
+7. **Interface Segregation Principle (ISP):** Clients should not be forced to depend on interfaces they do not use. This principle promotes the idea of segregating interfaces into smaller, focused ones, tailored to the needs of clients. It helps prevent bloated interfaces and reduces coupling between components.
+
+Here's a sample code example that demonstrates the SOLID principles in C#:
+
+```csharp
+// Interface Segregation Principle (ISP)
+public interface ICar
+{
+    void Start();
+    void Stop();
+}
+
+public interface IAirplane
+{
+    void TakeOff();
+    void Land();
+}
+
+public class Car : ICar
+{
+    public void Start()
+    {
+        // Code for starting a car
+    }
+
+    public void Stop()
+    {
+        // Code for stopping a car
+    }
+}
+
+public class Airplane : IAirplane
+{
+    public void TakeOff()
+    {
+        // Code for airplane takeoff
+    }
+
+    public void Land()
+    {
+        // Code for airplane landing
+    }
+}
+
+```
+
+- Interface Segregation Principle (ISP): The interfaces `ICar` and `IAirplane` define specific methods related to cars and airplanes, respectively. The `Car` class implements `ICar` with methods for starting and stopping a car, while the `Airplane` class implements `IAirplane` with methods for takeoff and landing. This way, clients can depend on the specific interfaces they need.
+
+9. **Dependency Inversion Principle (DIP):** High-level modules should not depend on low-level modules; both should depend on abstractions. Abstractions should not depend on details; details should depend on abstractions. This principle promotes loose coupling by inverting the traditional dependency relationships.
+
+Here's a sample code example that demonstrates the SOLID principles in C#:
+
+```csharp
+// Dependency Inversion Principle (DIP)
+public interface IMessageSender
+{
+    void SendMessage(string message);
+}
+
+public class EmailSender : IMessageSender
+{
+    public void SendMessage(string message)
+    {
+        // Code for sending an email
+    }
+}
+
+public class SMSSender : IMessageSender
+{
+    public void SendMessage(string message)
+    {
+        // Code for sending an SMS
+    }
+}
+
+public class NotificationService
+{
+    private IMessageSender _messageSender;
+
+    public NotificationService(IMessageSender messageSender)
+    {
+        _messageSender = messageSender;
+    }
+
+    public void SendNotification(string message)
+    {
+        _messageSender.SendMessage(message);
+    }
+}
+```
+
+- Dependency Inversion Principle (DIP): The `NotificationService` depends on the `IMessageSender` interface rather than concrete implementations. It can be injected with different implementations like `EmailSender` or `SMSSender` through constructor injection, allowing the service to work with any message sender that adheres to the `IMessageSender` contract.
 
 By following these SOLID principles, you can achieve a more modular, flexible, and maintainable codebase. Clean Architecture aligns with these principles by emphasizing separation of concerns, dependency inversion, and the use of interfaces to decouple components.
 
