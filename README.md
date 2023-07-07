@@ -4393,94 +4393,927 @@ The `IOptionsSnapshot` interface provides a way to access options that can be up
 
 By using the `IOptionsSnapshot` interface, you can easily access and use configuration options within your ASP.NET Core Web API, allowing you to change the behavior of your application without recompiling or restarting it.
 
-85. How can you implement request/response caching in ASP.NET Core Web API?
+### 85. How can you implement request/response caching in ASP.NET Core Web API?
     - Use the built-in response caching middleware to cache responses on the server or client side.
     - Set appropriate cache headers and options to control caching behavior.
     - Implement cache invalidation strategies based on business logic or expiration policies.
 
-86. How can you implement secure authentication using JWT (JSON Web Tokens) in ASP.NET Core Web API?
+Request/response caching in ASP.NET Core Web API allows you to cache the responses of certain requests, improving performance by serving cached responses instead of executing the same request repeatedly. It can be implemented using the built-in caching middleware and caching attributes.
+
+To implement request/response caching in ASP.NET Core Web API, you can follow these steps:
+
+1. Enable caching in the `Startup.cs` file:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddResponseCaching();
+    
+    // Other service configurations
+}
+
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    app.UseResponseCaching();
+    
+    // Other app configurations
+}
+```
+
+2. Apply the `[ResponseCache]` attribute to the controller or action methods that you want to cache:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+[ResponseCache(Duration = 60)] // Cache the response for 60 seconds
+public class UsersController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult Get()
+    {
+        // Retrieve users data
+
+        var users = new List<User>
+        {
+            new User { Id = 1, Name = "John" },
+            new User { Id = 2, Name = "Jane" }
+        };
+
+        return Ok(users);
+    }
+}
+```
+
+In this example, the `Get` action method of the `UsersController` is decorated with the `[ResponseCache]` attribute, specifying a cache duration of 60 seconds. This means that subsequent requests to the same endpoint within 60 seconds will be served from the cache.
+
+Note that the caching middleware and attributes work together to provide caching functionality. The middleware handles caching at the server level, while the attributes allow you to control caching at the controller or action level.
+
+By implementing request/response caching, you can improve the performance of your ASP.NET Core Web API by reducing the load on the server and serving cached responses for repetitive requests.
+
+### 86. How can you implement secure authentication using JWT (JSON Web Tokens) in ASP.NET Core Web API?
     - Use the `Microsoft.AspNetCore.Authentication.JwtBearer` package for JWT authentication.
     - Configure the authentication scheme and options in the `Startup.cs` file.
     - Verify the JWT token, validate claims, and authenticate the user based on the token.
 
-87. What is the purpose of the `Health Checks` feature in ASP.NET Core Web API?
+JWT (JSON Web Token) authentication is a popular method for securing APIs by providing a stateless way of authentication. ASP.NET Core Web API provides built-in support for JWT authentication through the `Microsoft.AspNetCore.Authentication.JwtBearer` package.
+
+To implement secure authentication using JWT in ASP.NET Core Web API, you can follow these steps:
+
+1. Install the `Microsoft.AspNetCore.Authentication.JwtBearer` NuGet package:
+
+```bash
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+```
+
+2. Configure JWT authentication in the `Startup.cs` file:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    // ...
+
+    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = "your-issuer",
+                ValidAudience = "your-audience",
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key"))
+            };
+        });
+
+    // ...
+}
+
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    // ...
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    // ...
+}
+```
+
+In this example, JWT authentication is added to the services using `AddAuthentication` and configured with the required parameters, such as issuer, audience, and the secret key used to sign and validate tokens. The authentication middleware is then added to the request pipeline using `UseAuthentication`.
+
+3. Protect your API endpoints with the `[Authorize]` attribute:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class UsersController : ControllerBase
+{
+    [HttpGet]
+    [Authorize]
+    public IActionResult Get()
+    {
+        // Retrieve users data
+
+        var users = new List<User>
+        {
+            new User { Id = 1, Name = "John" },
+            new User { Id = 2, Name = "Jane" }
+        };
+
+        return Ok(users);
+    }
+}
+```
+
+In this example, the `Get` action method of the `UsersController` is decorated with the `[Authorize]` attribute, which ensures that only authenticated requests with valid JWT tokens can access the endpoint.
+
+When making requests to the secured endpoints, clients need to include the JWT token in the `Authorization` header using the `Bearer` scheme:
+
+```
+GET /api/users HTTP/1.1
+Host: localhost:5000
+Authorization: Bearer {JWT token}
+```
+
+By implementing JWT authentication, you can secure your ASP.NET Core Web API and ensure that only authorized clients can access protected endpoints.
+
+### 87. What is the purpose of the `Health Checks` feature in ASP.NET Core Web API?
     - Health Checks provide a way to monitor the health of different components in an application.
     - They can check the status of databases, external services, or custom health checks.
     - Health Checks can be used for monitoring and automated health checks in deployment environments.
 
-88. How can you implement custom model binding in ASP.NET Core Web API?
+The `Health Checks` feature in ASP.NET Core Web API is used to monitor the health of your application and its dependencies. It allows you to define custom health checks that verify the status of various components, such as databases, external services, or any other resources your application relies on.
+
+By implementing health checks, you can determine the overall health of your application and quickly identify potential issues or failures. The health check results can be exposed through an endpoint, providing a convenient way to monitor the health status of your application.
+
+To implement health checks in ASP.NET Core Web API, you can follow these steps:
+
+1. Install the `Microsoft.AspNetCore.Diagnostics.HealthChecks` NuGet package:
+
+```bash
+dotnet add package Microsoft.AspNetCore.Diagnostics.HealthChecks
+```
+
+2. Configure health checks in the `Startup.cs` file:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddHealthChecks();
+
+    // Configure health checks for different components
+    services.AddHealthChecks()
+        .AddSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+        .AddUrlGroup(new Uri("https://api.example.com"), name: "ExternalAPI");
+
+    // Other service configurations
+}
+
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    // Other app configurations
+
+    app.UseRouting();
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapHealthChecks("/health");
+        // Other endpoint mappings
+    });
+
+    // Other app configurations
+}
+```
+
+In this example, the `AddHealthChecks` method is called in the `ConfigureServices` method to enable health checks. Health checks for SQL Server and an external API are configured using `AddSqlServer` and `AddUrlGroup` methods, respectively.
+
+The `/health` endpoint is mapped using the `MapHealthChecks` method in the `Configure` method, which exposes the health check results.
+
+3. Access the health check endpoint to monitor the health of your application:
+
+```
+GET /health
+```
+
+By accessing the `/health` endpoint, you can see the status of each configured health check. The response will indicate whether each component is healthy or if there are any issues.
+
+Implementing health checks helps ensure the stability and reliability of your ASP.NET Core Web API by monitoring the health of critical components and providing insights into their status.
+
+### 88. How can you implement custom model binding in ASP.NET Core Web API?
     - Create a custom model binder by implementing the `IModelBinder` interface.
     - Register the custom model binder in the application's services container.
     - Apply the custom model binder attribute on action parameters to bind them using the custom logic.
 
-89. What is the purpose of the `IHttpClientFactory` interface in ASP.NET Core Web API?
+Custom model binding in ASP.NET Core Web API allows you to bind HTTP request data to custom model types or perform custom conversion logic during the model binding process. It gives you control over how the data from the request is mapped to your model objects.
+
+To implement custom model binding in ASP.NET Core Web API, you can follow these steps:
+
+1. Create a custom model binder by implementing the `IModelBinder` interface:
+
+```csharp
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
+using System.Threading.Tasks;
+
+public class CustomModelBinder : IModelBinder
+{
+    public Task BindModelAsync(ModelBindingContext bindingContext)
+    {
+        // Perform custom model binding logic
+
+        // Retrieve data from the request
+        var valueProviderResult = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
+        var value = valueProviderResult.FirstValue;
+
+        // Convert the value to the desired model type
+        // Example: Convert the value to an integer
+        if (int.TryParse(value, out int result))
+        {
+            // Set the model value
+            bindingContext.Result = ModelBindingResult.Success(result);
+        }
+        else
+        {
+            // Unable to bind the value
+            bindingContext.Result = ModelBindingResult.Failed();
+        }
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+In this example, the `CustomModelBinder` class implements the `IModelBinder` interface. The `BindModelAsync` method is where you implement the custom model binding logic. In this case, it tries to convert the value from the request to an integer and sets the model value accordingly.
+
+2. Apply the custom model binder to your model class or action parameter using the `[ModelBinder]` attribute:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class UsersController : ControllerBase
+{
+    [HttpGet("{id}")]
+    public IActionResult Get([ModelBinder(typeof(CustomModelBinder))] int id)
+    {
+        // Use the bound model value (id)
+
+        return Ok(id);
+    }
+}
+```
+
+In this example, the `Get` action method uses the `[ModelBinder]` attribute to specify the custom model binder for the `id` parameter. When a request is made to the `Get` endpoint with an `id` value, the custom model binder will be used to bind and convert the value.
+
+3. Register the custom model binder in the `Startup.cs` file:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddControllers(options =>
+    {
+        options.ModelBinderProviders.Insert(0, new BinderTypeModelBinderProvider(typeof(CustomModelBinder)));
+    });
+
+    // Other service configurations
+}
+```
+
+In this example, the custom model binder is registered in the `ConfigureServices` method using the `ModelBinderProviders.Insert` method. It specifies the position where the custom model binder should be inserted in the model binder provider list.
+
+By implementing custom model binding, you can handle complex scenarios where the default model binding behavior is not sufficient or when you need to perform custom conversion or validation logic during the model binding process.
+
+### 89. What is the purpose of the `IHttpClientFactory` interface in ASP.NET Core Web API?
     - `IHttpClientFactory` is used to create and manage instances of `HttpClient`.
     - It provides a way to configure and reuse `HttpClient` instances efficiently.
     - `IHttpClientFactory` handles the lifetime and disposal of `HttpClient` instances and allows implementing best practices for HTTP communication.
 
-90. How can you implement versioning for your ASP.NET Core Web API?
+The `IHttpClientFactory` interface in ASP.NET Core Web API provides a central and managed way to create and manage instances of `HttpClient`. It helps improve the performance, reliability, and resource utilization of HTTP requests by reusing and pooling `HttpClient` instances.
+
+The main purpose of `IHttpClientFactory` is to address the issues with directly creating and managing instances of `HttpClient` manually, such as inefficient resource usage and potential socket exhaustion.
+
+Here's an example of how to use `IHttpClientFactory` in ASP.NET Core Web API:
+
+1. Register `IHttpClientFactory` in the `Startup.cs` file:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddHttpClient();
+
+    // Other service configurations
+}
+```
+
+In this example, the `AddHttpClient` method is called in the `ConfigureServices` method to register the `IHttpClientFactory` service.
+
+2. Use `IHttpClientFactory` in your services or controllers:
+
+```csharp
+public class MyService
+{
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public MyService(IHttpClientFactory httpClientFactory)
+    {
+        _httpClientFactory = httpClientFactory;
+    }
+
+    public async Task<string> GetExternalData()
+    {
+        var httpClient = _httpClientFactory.CreateClient();
+
+        // Use the httpClient to make HTTP requests
+        var response = await httpClient.GetAsync("https://api.example.com/data");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
+        }
+
+        return null;
+    }
+}
+```
+
+In this example, the `IHttpClientFactory` is injected into the `MyService` class. The `CreateClient` method is used to create an instance of `HttpClient` from the factory. This ensures that each service or controller gets its own `HttpClient` instance with default configurations.
+
+3. Use the `HttpClient` instance to make HTTP requests as needed.
+
+The `IHttpClientFactory` handles the lifecycle and
+
+management of `HttpClient` instances, including the reuse of existing instances and pooling. It helps improve the performance and efficiency of HTTP requests by avoiding unnecessary overhead and resource exhaustion.
+
+By using `IHttpClientFactory`, you can take advantage of the built-in management features provided by ASP.NET Core to handle `HttpClient` instances correctly and avoid common pitfalls associated with manual management.
+
+### 90. How can you implement versioning for your ASP.NET Core Web API?
     - Use the built-in API versioning middleware or libraries like Microsoft.AspNetCore.Mvc.Versioning.
     - Configure versioning options like URL-based, header-based, or query string-based versioning.
     - Create separate controllers or actions for different versions of the API.
 
-91. What is the purpose of the `ApiController` attribute in ASP.NET Core Web API?
+Implementing versioning in ASP.NET Core Web API allows you to handle different versions of your API endpoints. It enables you to introduce breaking changes or add new features while still supporting older versions of your API.
 
+To implement versioning in ASP.NET Core Web API, you can follow these steps:
+
+1. Install the `Microsoft.AspNetCore.Mvc.Versioning` NuGet package:
+
+```bash
+dotnet add package Microsoft.AspNetCore.Mvc.Versioning
+```
+
+2. Configure API versioning in the `Startup.cs` file:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddApiVersioning(options =>
+    {
+        options.ReportApiVersions = true;
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+    });
+
+    // Other service configurations
+}
+```
+
+In this example, the `AddApiVersioning` method is called in the `ConfigureServices` method to configure API versioning. The `ReportApiVersions` property is set to `true` to include the API version information in the response headers. The `AssumeDefaultVersionWhenUnspecified` property is set to `true` to assume the default version when the version is not specified in the request. The `DefaultApiVersion` property is set to `1.0` as the default version.
+
+3. Apply API versioning to your endpoints:
+
+```csharp
+[ApiController]
+[Route("api/{version:apiVersion}/[controller]")]
+public class UsersController : ControllerBase
+{
+    [HttpGet("{id}")]
+    [ApiVersion("1.0")]
+    public IActionResult GetV1(int id)
+    {
+        // Handle version 1.0 of the endpoint
+
+        return Ok($"Version 1.0 - User ID: {id}");
+    }
+
+    [HttpGet("{id}")]
+    [ApiVersion("2.0")]
+    public IActionResult GetV2(int id)
+    {
+        // Handle version 2.0 of the endpoint
+
+        return Ok($"Version 2.0 - User ID: {id}");
+    }
+}
+```
+
+In this example, the `UsersController` defines two versions of the `Get` endpoint: one for version 1.0 and another for version 2.0. The `[ApiVersion]` attribute is used to specify the version for each endpoint. The `{version:apiVersion}` route constraint is used to capture and include the version in the route.
+
+By implementing versioning, you can manage changes and enhancements to your ASP.NET Core Web API in a controlled manner, allowing different clients to use the appropriate versions and ensuring backward compatibility with existing clients.
+
+### 91. What is the purpose of the `ApiController` attribute in ASP.NET Core Web API?
    - The `ApiController` attribute is used to indicate that a class is an API controller in ASP.NET Core Web API.
    - It enables various API-related conventions and behaviors in the controller.
    - The `ApiController` attribute automatically performs model validation, handles validation errors, and enforces attribute routing.
 
-92. How can you implement request throttling in ASP.NET Core Web API?
+The `ApiController` attribute is used to decorate a controller class in ASP.NET Core Web API. It provides several benefits and conventions for building Web APIs, including automatic model validation, binding source parameter inference, and attribute routing.
 
+Here's an example of using the `ApiController` attribute:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class UsersController : ControllerBase
+{
+    // Action methods
+}
+```
+
+In this example, the `UsersController` class is decorated with the `ApiController` attribute. This attribute enables various features and conventions for Web API controllers.
+
+The benefits of using the `ApiController` attribute include:
+
+- **Automatic Model Validation**: The `ApiController` attribute automatically performs model validation and returns a 400 Bad Request response if the model state is invalid. This eliminates the need for manual validation checks in each action method.
+
+- **Binding Source Parameter Inference**: The `ApiController` attribute infers the binding source for action method parameters. By default, parameters are bound from the request body for complex types and from route values or query string for simple types. This simplifies parameter binding and reduces the need for explicit binding attributes.
+
+- **Attribute Routing**: The `ApiController` attribute enables attribute routing by default. With attribute routing, you can define routes directly on the controller and action methods using attributes like `[HttpGet]`, `[HttpPost]`, etc. This provides a more flexible and declarative way of defining routes compared to convention-based routing.
+
+- **Automatic HTTP 400 Responses**: The `ApiController` attribute automatically generates 400 Bad Request responses when model binding or validation fails. It simplifies error handling by eliminating the need for manual checks and response generation for common validation scenarios.
+
+The `ApiController` attribute is part of the ASP.NET Core Web API framework and helps streamline the development of Web APIs by providing default conventions and features. By using this attribute, you can take advantage of these benefits and write cleaner, more maintainable API code.
+
+### 92. How can you implement request throttling in ASP.NET Core Web API?
    - Use middleware or libraries like AspNetCoreRateLimit to implement request throttling.
    - Configure rate limits based on IP address, user, or client.
    - Return appropriate responses when request limits are exceeded.
 
-93. What is the purpose of the `ActionResult` class in ASP.NET Core Web API?
+Request throttling, also known as rate limiting, is the process of limiting the number of requests a client can make within a specific time period. It helps protect your ASP.NET Core Web API from abuse, control resource usage, and ensure fair access to your API.
 
+To implement request throttling in ASP.NET Core Web API, you can use various approaches. One common approach is to use a middleware or a library that provides rate limiting functionality.
+
+Here's an example of using the `AspNetCoreRateLimit` library to implement request throttling:
+
+First, install the `AspNetCoreRateLimit` NuGet package:
+
+```bash
+dotnet add package AspNetCoreRateLimit
+```
+
+Next, configure request throttling in the `Startup.cs` file:
+
+```csharp
+using AspNetCoreRateLimit;
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMemoryCache();
+
+    services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+
+    services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+    services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+    services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+    services.AddControllers();
+
+    // Other service configurations
+}
+
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    app.UseIpRateLimiting();
+
+    // Other app configurations
+}
+```
+
+In this example, the `AddMemoryCache` method is called to configure the memory cache used by the rate limiting middleware. The `Configure` method is used to configure the rate limit options from the app settings. The `AddSingleton` methods are called to register the required rate limit services.
+
+To apply request throttling to specific endpoints or controllers, you can use the `[RateLimit]` attribute:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+[RateLimit(Name = "LimitPerMinute", Limit = 100, Period = "1m")]
+public class UsersController : ControllerBase
+{
+    // Action methods
+}
+```
+
+In this example, the `[RateLimit]` attribute is applied to the `UsersController` with a limit of 100 requests per minute.
+
+You can customize the rate limit configuration by modifying the `appsettings.json` file:
+
+```json
+{
+  "IpRateLimiting": {
+    "EnableEndpointRateLimiting": true,
+    "StackBlockedRequests": false,
+    "RealIpHeader": "X-Real-IP",
+    "ClientIdHeader": "X-ClientId",
+    "HttpStatusCode": 429,
+    "GeneralRules": [
+      {
+        "Endpoint": "*",
+        "Period": "1m",
+        "Limit": 100
+      }
+    ],
+    "EndpointRules": []
+  }
+}
+```
+
+In this example, a general rule is defined with a limit of 100 requests per minute for all endpoints.
+
+By implementing request throttling, you can control the request rate of your ASP.NET Core Web API and protect your resources from excessive usage.
+
+### 93. What is the purpose of the `ActionResult` class in ASP.NET Core Web API?
    - The `ActionResult` class is the base class for types that represent various types of action results in ASP.NET Core Web API.
    - It allows you to return different types of responses from action methods, such as `Ok`, `BadRequest`, `NotFound`, `Created`, etc.
    - The `ActionResult` class provides a consistent way to return HTTP status codes, content, and headers from action methods.
 
-94. How can you implement content negotiation in ASP.NET Core Web API?
+The `ActionResult` class in ASP.NET Core Web API represents the result of an action method. It provides a flexible way to return various types of HTTP responses, including status codes, data, and content negotiation.
 
+The `ActionResult` class allows you to return different types of responses from your action methods based on the needs of your API and the client's requested content type. Some of the commonly used `ActionResult` subclasses include `OkResult`, `BadRequestResult`, `ObjectResult`, `JsonResult`, `NotFoundResult`, etc.
+
+Here's an example of using `ActionResult` in an action method:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class UsersController : ControllerBase
+{
+    [HttpGet("{id}")]
+    public ActionResult<User> GetUser(int id)
+    {
+        var user = _userService.GetUserById(id);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return user;
+    }
+}
+```
+
+In this example, the `GetUser` action method retrieves a user by ID and returns an `ActionResult<User>`. If the user is not found, it returns a `NotFoundResult`. If the user is found, it returns the `user` object, which will be automatically serialized to the appropriate content type based on the client's requested format.
+
+By using the `ActionResult` class, you can provide consistent and structured responses from your API. It allows you to handle different scenarios, such as success, errors, and not found cases, in a standardized way. Additionally, it supports content negotiation, allowing the response format to be determined based on the client's requested content type.
+
+### 94. How can you implement content negotiation in ASP.NET Core Web API?
    - Use the `Produces` and `Consumes` attributes to specify the supported content types for an action.
    - Configure the `Accept` and `Content-Type` headers to negotiate the content format.
    - Implement content formatters for different media types.
 
-95. What is the purpose of the `ILogger` interface in ASP.NET Core Web API?
+Content negotiation in ASP.NET Core Web API allows clients to request and receive data in different formats, such as JSON, XML, or custom media types. It enables your API to respond with the most appropriate representation based on the client's requested format.
 
+ASP.NET Core Web API supports content negotiation out of the box by leveraging the `Accept` header in the request. By default, it uses the `Newtonsoft.Json` library for JSON serialization. However, you can configure other formatters and support multiple content types.
+
+Here's an example of how to implement content negotiation in ASP.NET Core Web API:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class UsersController
+
+: ControllerBase
+{
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
+    {
+        _userService = userService;
+    }
+
+    [HttpGet]
+    public IActionResult Get()
+    {
+        var users = _userService.GetUsers();
+
+        return Ok(users);
+    }
+
+    [HttpGet("{id}")]
+    public IActionResult GetUser(int id)
+    {
+        var user = _userService.GetUserById(id);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(user);
+    }
+}
+```
+
+In this example, the `Get` action method returns a list of users using the `Ok` method, which automatically serializes the `users` object to JSON.
+
+The `GetUser` action method retrieves a user by ID and returns an `Ok` result if the user is found, or a `NotFound` result if the user is not found.
+
+By default, ASP.NET Core Web API will use JSON as the default response format. However, it also supports other formats like XML or custom media types.
+
+To enable XML serialization, you can add the `XmlSerializerOutputFormatter` to the `MvcOptions` in the `ConfigureServices` method in `Startup.cs`:
+
+```csharp
+services.AddControllers(options =>
+{
+    options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+});
+```
+
+With this configuration, if a client sends an `Accept` header requesting XML, ASP.NET Core Web API will automatically serialize the response to XML.
+
+To handle custom media types, you can create a custom output formatter by implementing the `OutputFormatter` class and adding it to the `MvcOptions`.
+
+By implementing content negotiation, your ASP.NET Core Web API can provide data in different formats, giving clients the flexibility to choose the representation that best suits their needs.
+
+### 95. What is the purpose of the `ILogger` interface in ASP.NET Core Web API?
    - The `ILogger` interface is used for logging messages and events in ASP.NET Core Web API.
    - It provides a way to log information, warnings, errors, and other log levels.
    - The `ILogger` interface allows you to log messages with different categories, scopes, and log levels.
 
-96. How can you implement request validation in ASP.NET Core Web API?
+The `ILogger` interface in ASP.NET Core Web API is used for logging messages and events within your application. It provides a way to record important information, errors, warnings, and other log entries during the execution of your API.
 
+Here's an example of how to use the `ILogger` interface in ASP.NET Core Web API:
+
+1. Inject the `ILogger` into your controller or service:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class MyController : ControllerBase
+{
+    private readonly ILogger<MyController> _logger;
+
+    public MyController(ILogger<MyController> logger)
+    {
+        _logger = logger;
+    }
+
+    // Action methods
+}
+```
+
+2. Use the logger to log messages:
+
+```csharp
+_logger.LogInformation("This is an informational log message.");
+_logger.LogWarning("This is a warning log message.");
+_logger.LogError("This is an error log message.");
+```
+
+In this example, the `ILogger<MyController>` is injected into the `MyController` constructor. The logger is then used to log messages at different log levels, such as `LogInformation`, `LogWarning`, or `LogError`.
+
+The `ILogger` interface provides various log methods that allow you to log different types of messages, including log levels, events, and exceptions. It also supports structured logging, which allows you to log structured data along with your log messages.
+
+The logging messages can be captured by different logging providers configured in your application, such as console logging, file logging, or logging to external services. The logging providers are configured in the `ConfigureLogging` method of the `Startup.cs` file.
+
+By using the `ILogger` interface, you can easily add logging capabilities to your ASP.NET Core Web API, enabling you to track and analyze the behavior of your application.
+
+### 96. How can you implement request validation in ASP.NET Core Web API?
    - Use data annotations, such as `[Required]`, `[Range]`, `[RegularExpression]`, etc., on model properties to perform automatic request validation.
    - Check the `ModelState` object in the action method to validate the model state and return appropriate error responses.
    - Implement custom validation logic by creating custom validation attributes or implementing the `IValidatableObject` interface.
 
-97. What is the purpose of the `FromQuery` attribute in ASP.NET Core Web API?
+Request validation in ASP.NET Core Web API ensures that incoming requests meet certain criteria or constraints before processing them. It helps to validate and sanitize user input, prevent malicious input or attacks, and ensure data integrity.
 
+Here's an example of how to implement request validation in ASP.NET Core Web API using model validation:
+
+1. Create a model class that represents the data expected in the request:
+
+```csharp
+public class MyModel
+{
+    [Required]
+    public string Name { get; set; }
+
+    [Range(18, 99)]
+    public int Age { get; set; }
+}
+```
+
+In this example, the `MyModel` class has properties `Name` and `Age` with validation attributes. The `Name` property is marked as `[Required]`, and the `Age` property is marked with `[Range(18, 99)]`, indicating that the age must be between 18 and 99.
+
+2. Use the model class as a parameter in your action method:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class MyController : ControllerBase
+{
+    [HttpPost]
+    public IActionResult Post([FromBody] MyModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        // Process the valid request
+
+        return Ok();
+    }
+}
+```
+
+In this example, the `Post` action method takes the `MyModel` object as a parameter, which will be populated with the request data based on the request content type. The `ModelState.IsValid` property is used to check if the model validation succeeded. If it fails, the API returns a `BadRequest` response with the validation errors.
+
+3. Send a request with the required data:
+
+```http
+POST /api/mycontroller HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "John",
+  "age": 25
+}
+```
+
+In this example, a valid JSON payload is sent in the request body with the required properties.
+
+ASP.NET Core Web API automatically performs model validation based on the data annotations and validation attributes specified in the model class. It checks the request data against these constraints and populates the `ModelState` object with any validation errors. By checking the `ModelState.IsValid` property, you can determine if the request is valid or not.
+
+Additionally, you can create custom validation attributes by implementing the `ValidationAttribute` class to perform more complex validation logic.
+
+### 97. What is the purpose of the `FromQuery` attribute in ASP.NET Core Web API?
    - The `FromQuery` attribute is used to bind action method parameters from query string values in ASP.NET Core Web API.
    - It allows you to retrieve values from the query string and bind them to method parameters.
    - The `FromQuery` attribute is particularly useful when working with GET requests and retrieving optional or additional parameters from the query string.
 
-98. How can you implement request logging in ASP.NET Core Web API?
+The `FromQuery` attribute in ASP.NET Core Web API is used to bind action method parameters to values from the query string of the request URL. It allows you to retrieve data from the query string and use it as inputs to your action methods.
 
+Here's an example of how to use the `FromQuery` attribute in ASP.NET Core Web API:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class MyController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult Get([FromQuery] string searchTerm)
+    {
+        // Use the searchTerm parameter
+
+        // Rest of the action method logic
+    }
+}
+```
+
+In this example, the `Get` action method has a parameter `searchTerm` decorated with the `[FromQuery]` attribute. This tells ASP.NET Core Web API to bind the value of `searchTerm` from the query string of the request URL.
+
+You can also specify a different query string parameter name if it differs from the parameter name:
+
+```csharp
+[HttpGet]
+public IActionResult Get([FromQuery(Name = "q")] string searchTerm)
+{
+    // Use the searchTerm parameter
+
+    // Rest of the action method logic
+}
+```
+
+In this modified example, the `searchTerm` parameter is bound to the `q` query string parameter instead of using the parameter name directly.
+
+The `FromQuery` attribute is useful when you want to pass data as query string parameters to your API endpoints. It simplifies the process of retrieving query string values and binding them to action method parameters.
+
+### 98. How can you implement request logging in ASP.NET Core Web API?
    - Use middleware or libraries like Serilog or NLog to log requests and their details.
    - Configure request logging middleware in the `Startup.cs` file.
    - Log relevant information such as request URL, HTTP method, headers, query parameters, and body.
 
-99. What is the purpose of the `ValidateAntiForgeryToken` attribute in ASP.NET Core Web API?
+Request logging in ASP.NET Core Web API allows you to log information about incoming requests, such as the request URL, headers, method, and other relevant details. It helps in debugging, auditing, and monitoring the behavior of your API.
 
+To implement request logging in ASP.NET Core Web API, you can use the built-in logging middleware and configure it in the `Startup.cs` file.
+
+Here's an example:
+
+1. Add the logging middleware in the `Configure` method of `Startup.cs`:
+
+```csharp
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+{
+    // Other app configurations
+
+    app.Use(async (context, next) =>
+    {
+        // Log the request details
+        logger.LogInformation("Request: {Method} {Path}", context.Request.Method, context.Request.Path);
+
+        // Call the next middleware
+        await next.Invoke();
+    });
+
+    // Other app configurations
+}
+```
+
+In this example, a custom middleware is added using the `app.Use` method. The middleware logs the request details using the `ILogger<Startup>` interface and then proceeds to the next middleware in the pipeline.
+
+2. Run your application and observe the logs.
+
+With this configuration, each incoming request will be logged with the request method and path. You can customize the logging format and include additional request details as needed.
+
+Note that the order of middleware registration matters. Ensure that the request logging middleware is registered before other middleware that may
+
+modify the request or generate a response, so that the logging occurs before any potential modifications.
+
+### 99. What is the purpose of the `ValidateAntiForgeryToken` attribute in ASP.NET Core Web API?
    - The `ValidateAntiForgeryToken` attribute is used to protect against Cross-Site Request Forgery (CSRF) attacks in ASP.NET Core Web API.
    - It ensures that requests include a valid anti-forgery token generated by the server.
    - The `ValidateAntiForgeryToken` attribute should be applied to actions that modify data or perform sensitive operations.
 
-100. How can you implement response compression in ASP.NET Core Web API?
+The `ValidateAntiForgeryToken` attribute in ASP.NET Core Web API is used to prevent cross-site request forgery (CSRF) attacks by validating the anti-forgery token included in the request. CSRF attacks occur when an attacker tricks a user's browser into making unintended requests on their behalf.
 
+To use the `ValidateAntiForgeryToken` attribute, follow these steps:
+
+1. Add the `ValidateAntiForgeryToken` attribute to the desired action method in your controller:
+
+```csharp
+[HttpPost]
+[ValidateAntiForgeryToken]
+public IActionResult MyAction(MyModel model)
+{
+    // Action method logic
+}
+```
+
+In this example, the `ValidateAntiForgeryToken` attribute is applied to the `MyAction` action method. It ensures that a valid anti-forgery token is present in the request before the method is executed.
+
+2. Include the anti-forgery token in the request:
+
+When making a request to the action method, you need to include the anti-forgery token in the request data. This can be done by including it as a hidden field in an HTML form or as a header in an AJAX request.
+
+```html
+<form action="/api/mycontroller/myaction" method="post">
+    @Html.AntiForgeryToken()
+
+    <!-- Other form fields -->
+
+    <button type="submit">Submit</button>
+</form>
+```
+
+In this example, the `@Html.AntiForgeryToken()` method generates a hidden field containing the anti-forgery token. This ensures that the token is included in the form data when the user submits the form.
+
+3. Validate the anti-forgery token in the action method:
+
+The `ValidateAntiForgeryToken` attribute automatically validates the anti-forgery token and ensures its correctness. If the token is missing or invalid, ASP.NET Core Web API returns a `400 Bad Request` response.
+
+By using the `ValidateAntiForgeryToken` attribute, you can protect your ASP.NET Core Web API endpoints from CSRF attacks by ensuring that only requests with valid anti-forgery tokens are accepted.
+
+### 100. How can you implement response compression in ASP.NET Core Web API?
     - Use middleware or libraries like Microsoft.AspNetCore.ResponseCompression to enable response compression.
     - Configure compression options
+
+Response compression in ASP.NET Core Web API reduces the size of the response data sent back to the client, resulting in improved network efficiency and reduced bandwidth usage. It can significantly improve the performance and responsiveness of your API, especially when dealing with large amounts of data.
+
+To implement response compression in ASP.NET Core Web API, follow these steps:
+
+1. Install the `Microsoft.AspNetCore.ResponseCompression` package:
+
+```
+dotnet add package Microsoft.AspNetCore.ResponseCompression
+```
+
+2. Configure response compression in the `ConfigureServices` method of `Startup.cs`:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddResponseCompression(options =>
+    {
+        options.EnableForHttps = true; // Enable compression for HTTPS requests (optional)
+    });
+
+    // Other service configurations
+}
+```
+
+3. Enable response compression in the `Configure` method of `Startup.cs`:
+
+```csharp
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    app.UseResponseCompression();
+
+    // Other app configurations
+}
+```
+
+4. Run your application and observe the compressed responses.
+
+With this configuration, ASP.NET Core Web API automatically compresses the response data using the appropriate compression algorithm, such as GZip or Deflate, based on the client's request headers. The compressed response is then sent back to the client, reducing the network payload.
+
+By implementing response compression, you can optimize the performance of your ASP.NET Core Web API by reducing the amount of data transmitted over the network, leading to faster response times and improved scalability.
 
 101. How can you implement authentication and authorization in ASP.NET Core Web API?
 
