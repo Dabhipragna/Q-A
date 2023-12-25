@@ -5316,7 +5316,6 @@ With this configuration, ASP.NET Core Web API automatically compresses the respo
 By implementing response compression, you can optimize the performance of your ASP.NET Core Web API by reducing the amount of data transmitted over the network, leading to faster response times and improved scalability.
 
 ### 101. How can you implement authentication and authorization in ASP.NET Core Web API?
-
    - Use authentication middleware such as JWT (JSON Web Tokens), OAuth, or IdentityServer to implement authentication in ASP.NET Core Web API.
    - Configure authentication options and schemes in the `Startup.cs` file.
    - Use authorization attributes like `[Authorize]` to secure controllers or actions based on user roles or policies.
