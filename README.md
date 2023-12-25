@@ -5316,10 +5316,11 @@ With this configuration, ASP.NET Core Web API automatically compresses the respo
 By implementing response compression, you can optimize the performance of your ASP.NET Core Web API by reducing the amount of data transmitted over the network, leading to faster response times and improved scalability.
 
 ### 101. How can you implement authentication and authorization in ASP.NET Core Web API?
-   - Use authentication middleware such as JWT (JSON Web Tokens), OAuth, or IdentityServer to implement authentication in ASP.NET Core Web API.
+```   - Use authentication middleware such as JWT (JSON Web Tokens), OAuth, or IdentityServer to implement authentication in ASP.NET Core Web API.
    - Configure authentication options and schemes in the `Startup.cs` file.
    - Use authorization attributes like `[Authorize]` to secure controllers or actions based on user roles or policies.
    - Implement custom authorization handlers to define fine-grained authorization rules.
+```
 
 **Concept:**
 Authentication verifies the identity of a user, while authorization determines the access rights of that user.
@@ -5357,10 +5358,11 @@ public class MyController : ControllerBase
 ```
 
 ### 102. What is the purpose of the `ProducesResponseType` attribute in ASP.NET Core Web API?
-
+```
    - The `ProducesResponseType` attribute is used to specify the possible HTTP response types that an action method can produce in ASP.NET Core Web API.
    - It helps document the expected response types and status codes for clients consuming the API.
    - The `ProducesResponseType` attribute is typically used in conjunction with the `Produces` attribute to provide a more detailed description of the expected responses.
+```
 
 **Concept:**
 `ProducesResponseType` attribute specifies the expected HTTP response types for an action method, helping in API documentation generation.
@@ -5377,11 +5379,12 @@ public IActionResult Get(int id)
 ```
 
 ### 103. How can you implement caching in ASP.NET Core Web API?
-
+```
    - Use the `ResponseCache` attribute to enable caching for individual actions or controllers.
    - Configure caching options in the `Startup.cs` file, such as setting the cache duration and cache location.
    - Use cache headers like `Cache-Control` and `ETag` to control caching behavior.
    - Implement distributed caching using providers like Redis or SQL Server if you require caching across multiple instances or servers.
+```
 
 **Concept:**
 Caching improves performance by storing and reusing previously fetched or computed data.
@@ -5397,10 +5400,11 @@ public IActionResult Get(int id)
 ```
 
 ### 104. What is the purpose of the `ApiControllerAttribute` in ASP.NET Core Web API?
-
+```
    - The `ApiControllerAttribute` is used to indicate that a class is an API controller in ASP.NET Core Web API.
    - It enables various conventions and behaviors specific to API controllers, such as automatic model validation, attribute routing, and more.
    - The `ApiControllerAttribute` reduces the amount of boilerplate code required in API controllers by applying sensible defaults.
+```
 
 **Concept:**
 `ApiControllerAttribute` enhances the behavior of a controller, providing features like automatic model validation and attribute routing.
@@ -5416,11 +5420,12 @@ public class MyController : ControllerBase
 ```
 
 ### 105. How can you implement versioning in ASP.NET Core Web API?
-
+```
    - Use the Microsoft.AspNetCore.Mvc.Versioning package to enable API versioning in ASP.NET Core Web API.
    - Configure API versioning options in the `Startup.cs` file, such as default versions, versioning schemes, and versioning conventions.
    - Use URL-based versioning, query string parameter versioning, or header-based versioning to indicate the desired API version.
    - Implement version-specific controllers or actions to handle different versions of the API.
+```
 
 **Concept:**
 API versioning allows multiple versions of an API to coexist.
@@ -5451,10 +5456,11 @@ public class MyController : ControllerBase
 ```
 
 ### 106. What is the purpose of the `ModelState` object in ASP.NET Core Web API?
-
+```
    - The `ModelState` object represents the state of the model binding process and validation results in ASP.NET Core Web API.
    - It contains information about any model binding errors or validation errors that occurred during the request processing.
    - The `ModelState` object is used to check the validity of the model state and return appropriate error responses.
+```
 
 **Concept:**
 `ModelState` tracks the validation state of model properties, helping in providing meaningful error responses.
@@ -5479,11 +5485,12 @@ public class MyController : ControllerBase
 ```
 
 ### 107. How can you implement error handling in ASP.NET Core Web API?
-
+```
    - Use the `UseExceptionHandler` middleware to handle exceptions globally and return appropriate error responses.
    - Implement custom exception filters to handle specific types of exceptions and provide custom error responses.
    - Use the `ProblemDetails` class or custom error response objects to provide detailed error information in the response.
    - Log exceptions and error details for debugging and monitoring purposes.
+```
 
 **Concept:**
 Error handling ensures graceful responses for unexpected issues.
@@ -5507,10 +5514,11 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 ```
 
 ### 108. What is the purpose of the `HttpGet` attribute in ASP.NET Core Web API?
-
+```
    - The `HttpGet` attribute is used to indicate that an action method should respond to HTTP GET requests in ASP.NET Core Web API.
    - It helps in mapping the HTTP verb to the appropriate action method.
    - The `HttpGet` attribute is part of the attribute routing system in ASP.NET Core Web API.
+```
 
 **Concept:**
 `HttpGet` attribute specifies that the associated action responds to HTTP GET requests.
@@ -5525,11 +5533,12 @@ public IActionResult Get(int id)
 ```
 
 ### 109. How can you implement file uploads in ASP.NET Core Web API?
-
+```
    - Use the `[FromForm]` attribute to bind uploaded files to method parameters in ASP.NET Core Web API.
    - Configure the maximum allowed file size and other upload-related options in the `Startup.cs` file.
    - Use the `IFormFile` interface to access and process the uploaded file(s) in the action method.
    - Save the uploaded file(s) to disk, database, or cloud storage as per your application requirements.
+```
 
 **Concept:**
 File uploads allow clients to send files to the server.
@@ -5553,10 +5562,11 @@ public async Task<IActionResult> UploadFile(List<IFormFile> files)
 ```
 
 ### 110. What is the purpose of the `ProducesResponseType` attribute in ASP.NET Core Web API?
-
+```
    - The `ProducesResponseType` attribute is used to specify the possible HTTP response types that an action method can produce in ASP.NET Core Web API.
    - It helps document the expected response types and status codes for clients consuming the API.
    - The `ProducesResponseType` attribute is typically used in conjunction with the `Produces` attribute to provide a more detailed description of the expected responses.
+```
 
 **Concept:**
 Repeating question 102; see its description and sample code.
@@ -5570,63 +5580,72 @@ Repeating question 102; see its description and sample code.
 ```
 
 112. What is the purpose of the `[ApiController]` attribute in ASP.NET Core Web API?
-
+```
    - The `[ApiController]` attribute is used to indicate that a class is an API controller in ASP.NET Core Web API.
    - It enables various conventions and behaviors specific to API controllers, such as automatic model validation, attribute routing, and more.
    - The `[ApiController]` attribute reduces the amount of boilerplate code required in API controllers by applying sensible defaults.
+```
 
 113. How can you configure dependency injection in ASP.NET Core Web API?
-
+```
    - Use the `ConfigureServices` method in `Startup.cs` to register services for dependency injection.
    - Use the `AddTransient`, `AddScoped`, or `AddSingleton` methods to register services with different lifetimes.
    - Inject dependencies into controller constructors or action methods using constructor injection or method injection.
    - Use the `IServiceProvider` interface to resolve services manually if required.
+```
 
 114. What is the purpose of the `[FromBody]` attribute in ASP.NET Core Web API?
-
+```
    - The `[FromBody]` attribute is used to bind complex types from the request body in ASP.NET Core Web API.
    - It allows the automatic deserialization of JSON or XML request data into model objects.
    - The `[FromBody]` attribute is typically used in conjunction with the `[HttpPost]` attribute to handle POST requests with a request body.
+```
 
 115. How can you implement logging in ASP.NET Core Web API?
-
+```
    - Use the built-in logging framework in ASP.NET Core, which supports various logging providers such as Console, Debug, File, and more.
    - Configure logging options in the `appsettings.json` file or programmatically in the `Startup.cs` file.
    - Inject the `ILogger<T>` interface into controllers or services to log events and messages.
    - Use different log levels (`Debug`, `Information`, `Warning`, `Error`, etc.) based on the severity of the log message.
+```
 
 116. What is the purpose of the `[HttpPost]` attribute in ASP.NET Core Web API?
-
+```
    - The `[HttpPost]` attribute is used to indicate that an action method should respond to HTTP POST requests in ASP.NET Core Web API.
    - It helps in mapping the HTTP verb to the appropriate action method.
    - The `[HttpPost]` attribute is part of the attribute routing system in ASP.NET Core Web API.
+```
 
 117. How can you implement request validation in ASP.NET Core Web API?
-
+```
    - Use data annotations and model validation attributes in the model classes to define validation rules.
    - Enable automatic model validation by applying the `[ApiController]` attribute to the controller.
    - Check the `ModelState.IsValid` property in the action method to determine if the request data passed validation.
    - Return appropriate error responses if the request data fails validation.
+```
 
 118. What is the purpose of the `[HttpPut]` attribute in ASP.NET Core Web API?
-
+```
    - The `[HttpPut]` attribute is used to indicate that an action method should respond to HTTP PUT requests in ASP.NET Core Web API.
    - It helps in mapping the HTTP verb to the appropriate action method.
    - The `[HttpPut]` attribute is part of the attribute routing system in ASP.NET Core Web API.
+```
 
 119. What is the purpose of the `[HttpDelete]` attribute in ASP.NET Core Web API?
-
+```
    - The `[HttpDelete]` attribute is used to indicate that an action method should respond to HTTP DELETE requests in ASP.NET Core Web API.
    - It helps in mapping the HTTP verb to the appropriate action method.
    - The `[HttpDelete]` attribute is part of the attribute routing system in ASP.NET Core Web API.
+```
 
 120. How can you implement versioning in ASP.NET Core Web API?
-
+```
    - Use the `Microsoft.AspNetCore.Mvc.Versioning` NuGet package to enable API versioning.
    - Configure API versioning in the `ConfigureServices` method of `Startup.cs`.
    - Apply the `[ApiVersion]` attribute to controllers or actions to specify the version(s) they support.
    - Use the `ApiVersion` attribute in the URL, query string, or request header to indicate the desired version.
    - Implement version-specific logic in the controllers or use a version-specific controller.
+```
 
 121. How can you implement authentication and authorization in ASP.NET Core Web API?
 
