@@ -5562,11 +5562,12 @@ public async Task<IActionResult> UploadFile(List<IFormFile> files)
 Repeating question 102; see its description and sample code.
 
 ### 111. How can you handle cross-origin requests (CORS) in ASP.NET Core Web API?
-
+```
    - Use the `AddCors` method in the `ConfigureServices` method of `Startup.cs` to enable CORS.
    - Configure CORS policies using the `AddCors` method, specifying allowed origins, headers, methods, and other options.
    - Apply the `EnableCors` attribute to controllers or actions to override or apply specific CORS policies.
    - Handle preflight OPTIONS requests by allowing the appropriate headers and methods in the CORS policy.
+```
 
 112. What is the purpose of the `[ApiController]` attribute in ASP.NET Core Web API?
 
