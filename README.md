@@ -5315,72 +5315,254 @@ With this configuration, ASP.NET Core Web API automatically compresses the respo
 
 By implementing response compression, you can optimize the performance of your ASP.NET Core Web API by reducing the amount of data transmitted over the network, leading to faster response times and improved scalability.
 
-101. How can you implement authentication and authorization in ASP.NET Core Web API?
+### 101. How can you implement authentication and authorization in ASP.NET Core Web API?
 
    - Use authentication middleware such as JWT (JSON Web Tokens), OAuth, or IdentityServer to implement authentication in ASP.NET Core Web API.
    - Configure authentication options and schemes in the `Startup.cs` file.
    - Use authorization attributes like `[Authorize]` to secure controllers or actions based on user roles or policies.
    - Implement custom authorization handlers to define fine-grained authorization rules.
 
-102. What is the purpose of the `ProducesResponseType` attribute in ASP.NET Core Web API?
+**Concept:**
+Authentication verifies the identity of a user, while authorization determines the access rights of that user.
+
+**Sample Code:**
+```csharp
+// Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", options =>
+        {
+            options.Authority = "https://your-authorization-server";
+            options.Audience = "your-api-resource";
+        });
+
+    services.AddAuthorization(options =>
+    {
+        options.AddPolicy("MyPolicy", policy =>
+        {
+            policy.RequireAuthenticatedUser();
+            // Add additional requirements as needed
+        });
+    });
+}
+
+// Controller.cs
+[Authorize("MyPolicy")]
+[ApiController]
+[Route("api/[controller]")]
+public class MyController : ControllerBase
+{
+    // Your authorized actions
+}
+```
+
+### 102. What is the purpose of the `ProducesResponseType` attribute in ASP.NET Core Web API?
 
    - The `ProducesResponseType` attribute is used to specify the possible HTTP response types that an action method can produce in ASP.NET Core Web API.
    - It helps document the expected response types and status codes for clients consuming the API.
    - The `ProducesResponseType` attribute is typically used in conjunction with the `Produces` attribute to provide a more detailed description of the expected responses.
 
-103. How can you implement caching in ASP.NET Core Web API?
+**Concept:**
+`ProducesResponseType` attribute specifies the expected HTTP response types for an action method, helping in API documentation generation.
+
+**Sample Code:**
+```csharp
+[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MyModel))]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
+[HttpGet("{id}")]
+public IActionResult Get(int id)
+{
+    // Your action logic
+}
+```
+
+### 103. How can you implement caching in ASP.NET Core Web API?
 
    - Use the `ResponseCache` attribute to enable caching for individual actions or controllers.
    - Configure caching options in the `Startup.cs` file, such as setting the cache duration and cache location.
    - Use cache headers like `Cache-Control` and `ETag` to control caching behavior.
    - Implement distributed caching using providers like Redis or SQL Server if you require caching across multiple instances or servers.
 
-104. What is the purpose of the `ApiControllerAttribute` in ASP.NET Core Web API?
+**Concept:**
+Caching improves performance by storing and reusing previously fetched or computed data.
+
+**Sample Code:**
+```csharp
+[ResponseCache(Duration = 60)] // Cache for 60 seconds
+[HttpGet("{id}")]
+public IActionResult Get(int id)
+{
+    // Your action logic
+}
+```
+
+### 104. What is the purpose of the `ApiControllerAttribute` in ASP.NET Core Web API?
 
    - The `ApiControllerAttribute` is used to indicate that a class is an API controller in ASP.NET Core Web API.
    - It enables various conventions and behaviors specific to API controllers, such as automatic model validation, attribute routing, and more.
    - The `ApiControllerAttribute` reduces the amount of boilerplate code required in API controllers by applying sensible defaults.
 
-105. How can you implement versioning in ASP.NET Core Web API?
+**Concept:**
+`ApiControllerAttribute` enhances the behavior of a controller, providing features like automatic model validation and attribute routing.
+
+**Sample Code:**
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class MyController : ControllerBase
+{
+    // Your actions
+}
+```
+
+### 105. How can you implement versioning in ASP.NET Core Web API?
 
    - Use the Microsoft.AspNetCore.Mvc.Versioning package to enable API versioning in ASP.NET Core Web API.
    - Configure API versioning options in the `Startup.cs` file, such as default versions, versioning schemes, and versioning conventions.
    - Use URL-based versioning, query string parameter versioning, or header-based versioning to indicate the desired API version.
    - Implement version-specific controllers or actions to handle different versions of the API.
 
-106. What is the purpose of the `ModelState` object in ASP.NET Core Web API?
+**Concept:**
+API versioning allows multiple versions of an API to coexist.
+
+**Sample Code:**
+```csharp
+// Install the Microsoft.AspNetCore.Mvc.Versioning NuGet package
+
+// Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    });
+}
+
+// Controller.cs
+[ApiVersion("1.0")]
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+public class MyController : ControllerBase
+{
+    // Your actions for version 1.0
+}
+```
+
+### 106. What is the purpose of the `ModelState` object in ASP.NET Core Web API?
 
    - The `ModelState` object represents the state of the model binding process and validation results in ASP.NET Core Web API.
    - It contains information about any model binding errors or validation errors that occurred during the request processing.
    - The `ModelState` object is used to check the validity of the model state and return appropriate error responses.
 
-107. How can you implement error handling in ASP.NET Core Web API?
+**Concept:**
+`ModelState` tracks the validation state of model properties, helping in providing meaningful error responses.
+
+**Sample Code:**
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class MyController : ControllerBase
+{
+    [HttpPost]
+    public IActionResult Create(UserModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            // Handle invalid model
+            return BadRequest(ModelState);
+        }
+        // Your action logic
+    }
+}
+```
+
+### 107. How can you implement error handling in ASP.NET Core Web API?
 
    - Use the `UseExceptionHandler` middleware to handle exceptions globally and return appropriate error responses.
    - Implement custom exception filters to handle specific types of exceptions and provide custom error responses.
    - Use the `ProblemDetails` class or custom error response objects to provide detailed error information in the response.
    - Log exceptions and error details for debugging and monitoring purposes.
 
-108. What is the purpose of the `HttpGet` attribute in ASP.NET Core Web API?
+**Concept:**
+Error handling ensures graceful responses for unexpected issues.
+
+**Sample Code:**
+```csharp
+// Startup.cs
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    if (env.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
+    }
+    else
+    {
+        app.UseExceptionHandler("/Home/Error");
+        app.UseHsts();
+    }
+    // Other configurations
+}
+```
+
+### 108. What is the purpose of the `HttpGet` attribute in ASP.NET Core Web API?
 
    - The `HttpGet` attribute is used to indicate that an action method should respond to HTTP GET requests in ASP.NET Core Web API.
    - It helps in mapping the HTTP verb to the appropriate action method.
    - The `HttpGet` attribute is part of the attribute routing system in ASP.NET Core Web API.
 
-109. How can you implement file uploads in ASP.NET Core Web API?
+**Concept:**
+`HttpGet` attribute specifies that the associated action responds to HTTP GET requests.
+
+**Sample Code:**
+```csharp
+[HttpGet("{id}")]
+public IActionResult Get(int id)
+{
+    // Your action logic
+}
+```
+
+### 109. How can you implement file uploads in ASP.NET Core Web API?
 
    - Use the `[FromForm]` attribute to bind uploaded files to method parameters in ASP.NET Core Web API.
    - Configure the maximum allowed file size and other upload-related options in the `Startup.cs` file.
    - Use the `IFormFile` interface to access and process the uploaded file(s) in the action method.
    - Save the uploaded file(s) to disk, database, or cloud storage as per your application requirements.
 
-110. What is the purpose of the `ProducesResponseType` attribute in ASP.NET Core Web API?
+**Concept:**
+File uploads allow clients to send files to the server.
+
+**Sample Code:**
+```csharp
+// Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddControllersWithViews();
+    services.AddRazorPages();
+    services.AddHttpContextAccessor();
+}
+
+// Controller.cs
+[HttpPost("UploadFile")]
+public async Task<IActionResult> UploadFile(List<IFormFile> files)
+{
+    // Your file upload logic
+}
+```
+
+### 110. What is the purpose of the `ProducesResponseType` attribute in ASP.NET Core Web API?
 
    - The `ProducesResponseType` attribute is used to specify the possible HTTP response types that an action method can produce in ASP.NET Core Web API.
    - It helps document the expected response types and status codes for clients consuming the API.
    - The `ProducesResponseType` attribute is typically used in conjunction with the `Produces` attribute to provide a more detailed description of the expected responses.
 
-111. How can you handle cross-origin requests (CORS) in ASP.NET Core Web API?
+**Concept:**
+Repeating question 102; see its description and sample code.
+
+### 111. How can you handle cross-origin requests (CORS) in ASP.NET Core Web API?
 
    - Use the `AddCors` method in the `ConfigureServices` method of `Startup.cs` to enable CORS.
    - Configure CORS policies using the `AddCors` method, specifying allowed origins, headers, methods, and other options.
