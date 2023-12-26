@@ -5579,14 +5579,54 @@ Repeating question 102; see its description and sample code.
    - Handle preflight OPTIONS requests by allowing the appropriate headers and methods in the CORS policy.
 ```
 
-112. What is the purpose of the `[ApiController]` attribute in ASP.NET Core Web API?
+```csharp
+// ConfigureServices method in Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddCors(options =>
+    {
+        options.AddPolicy("AllowSpecificOrigin",
+            builder => builder.WithOrigins("http://example.com")
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+    });
+}
+
+// Configure method in Startup.cs
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    // Other app configurations
+
+    app.UseCors("AllowSpecificOrigin");
+
+    // Other app configurations
+}
+
+// EnableCors attribute in a controller
+[EnableCors("AllowSpecificOrigin")]
+public class MyController : ControllerBase
+{
+    // Controller actions
+}
+```
+
+### 112. What is the purpose of the `[ApiController]` attribute in ASP.NET Core Web API?
 ```
    - The `[ApiController]` attribute is used to indicate that a class is an API controller in ASP.NET Core Web API.
    - It enables various conventions and behaviors specific to API controllers, such as automatic model validation, attribute routing, and more.
    - The `[ApiController]` attribute reduces the amount of boilerplate code required in API controllers by applying sensible defaults.
 ```
 
-113. How can you configure dependency injection in ASP.NET Core Web API?
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class MyController : ControllerBase
+{
+    // Controller actions
+}
+```
+
+### 113. How can you configure dependency injection in ASP.NET Core Web API?
 ```
    - Use the `ConfigureServices` method in `Startup.cs` to register services for dependency injection.
    - Use the `AddTransient`, `AddScoped`, or `AddSingleton` methods to register services with different lifetimes.
@@ -5594,51 +5634,154 @@ Repeating question 102; see its description and sample code.
    - Use the `IServiceProvider` interface to resolve services manually if required.
 ```
 
-114. What is the purpose of the `[FromBody]` attribute in ASP.NET Core Web API?
+```csharp
+// ConfigureServices method in Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddTransient<IMyService, MyService>(); // AddTransient, AddScoped, or AddSingleton based on your needs
+}
+
+// Constructor injection in a controller
+public class MyController : ControllerBase
+{
+    private readonly IMyService _myService;
+
+    public MyController(IMyService myService)
+    {
+        _myService = myService;
+    }
+
+    // Controller actions using _myService
+}
+```
+
+### 114. What is the purpose of the `[FromBody]` attribute in ASP.NET Core Web API?
 ```
    - The `[FromBody]` attribute is used to bind complex types from the request body in ASP.NET Core Web API.
    - It allows the automatic deserialization of JSON or XML request data into model objects.
    - The `[FromBody]` attribute is typically used in conjunction with the `[HttpPost]` attribute to handle POST requests with a request body.
 ```
 
-115. How can you implement logging in ASP.NET Core Web API?
+```csharp
+[HttpPost]
+public IActionResult MyAction([FromBody] MyModel model)
+{
+    // Model is automatically bound from the request body
+    // Do something with the model
+    return Ok();
+}
+```
+
+### 115. How can you implement logging in ASP.NET Core Web API?
 ```
    - Use the built-in logging framework in ASP.NET Core, which supports various logging providers such as Console, Debug, File, and more.
    - Configure logging options in the `appsettings.json` file or programmatically in the `Startup.cs` file.
    - Inject the `ILogger<T>` interface into controllers or services to log events and messages.
    - Use different log levels (`Debug`, `Information`, `Warning`, `Error`, etc.) based on the severity of the log message.
 ```
+```csharp
+// Startup.cs
+public void ConfigureLogging(IServiceCollection services)
+{
+    services.AddLogging(builder =>
+    {
+        builder.AddConsole();
+        builder.AddDebug();
+    });
+}
 
-116. What is the purpose of the `[HttpPost]` attribute in ASP.NET Core Web API?
+// Controller or service
+public class MyController : ControllerBase
+{
+    private readonly ILogger<MyController> _logger;
+
+    public MyController(ILogger<MyController> logger)
+    {
+        _logger = logger;
+    }
+
+    public IActionResult MyAction()
+    {
+        _logger.LogInformation("Log message");
+        return Ok();
+    }
+}
+```
+
+### 116. What is the purpose of the `[HttpPost]` attribute in ASP.NET Core Web API?
 ```
    - The `[HttpPost]` attribute is used to indicate that an action method should respond to HTTP POST requests in ASP.NET Core Web API.
    - It helps in mapping the HTTP verb to the appropriate action method.
    - The `[HttpPost]` attribute is part of the attribute routing system in ASP.NET Core Web API.
 ```
+```csharp
+[HttpPost]
+public IActionResult MyAction([FromBody] MyModel model)
+{
+    // Handle HTTP POST request
+    return Ok();
+}
+```
 
-117. How can you implement request validation in ASP.NET Core Web API?
+### 117. How can you implement request validation in ASP.NET Core Web API?
 ```
    - Use data annotations and model validation attributes in the model classes to define validation rules.
    - Enable automatic model validation by applying the `[ApiController]` attribute to the controller.
    - Check the `ModelState.IsValid` property in the action method to determine if the request data passed validation.
    - Return appropriate error responses if the request data fails validation.
 ```
+```csharp
+// Model with validation attributes
+public class MyModel
+{
+    [Required]
+    public string Name { get; set; }
+}
 
-118. What is the purpose of the `[HttpPut]` attribute in ASP.NET Core Web API?
+// Controller action
+[HttpPost]
+public IActionResult MyAction([FromBody] MyModel model)
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(ModelState);
+    }
+    // Process the valid model
+    return Ok();
+}
+```
+
+### 118. What is the purpose of the `[HttpPut]` attribute in ASP.NET Core Web API?
 ```
    - The `[HttpPut]` attribute is used to indicate that an action method should respond to HTTP PUT requests in ASP.NET Core Web API.
    - It helps in mapping the HTTP verb to the appropriate action method.
    - The `[HttpPut]` attribute is part of the attribute routing system in ASP.NET Core Web API.
 ```
+```csharp
+[HttpPut("{id}")]
+public IActionResult UpdateItem(int id, [FromBody] MyModel model)
+{
+    // Handle HTTP PUT request
+    return Ok();
+}
+```
 
-119. What is the purpose of the `[HttpDelete]` attribute in ASP.NET Core Web API?
+### 119. What is the purpose of the `[HttpDelete]` attribute in ASP.NET Core Web API?
 ```
    - The `[HttpDelete]` attribute is used to indicate that an action method should respond to HTTP DELETE requests in ASP.NET Core Web API.
    - It helps in mapping the HTTP verb to the appropriate action method.
    - The `[HttpDelete]` attribute is part of the attribute routing system in ASP.NET Core Web API.
 ```
+```csharp
+[HttpDelete("{id}")]
+public IActionResult DeleteItem(int id)
+{
+    // Handle HTTP DELETE request
+    return Ok();
+}
+```
 
-120. How can you implement versioning in ASP.NET Core Web API?
+### 120. How can you implement versioning in ASP.NET Core Web API?
 ```
    - Use the `Microsoft.AspNetCore.Mvc.Versioning` NuGet package to enable API versioning.
    - Configure API versioning in the `ConfigureServices` method of `Startup.cs`.
@@ -5646,19 +5789,80 @@ Repeating question 102; see its description and sample code.
    - Use the `ApiVersion` attribute in the URL, query string, or request header to indicate the desired version.
    - Implement version-specific logic in the controllers or use a version-specific controller.
 ```
+```csharp
+// ConfigureServices method in Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    });
+}
 
-121. How can you implement authentication and authorization in ASP.NET Core Web API?
+// Controller with versioning
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+public class MyController : ControllerBase
+{
+    // Controller actions for version 1.0
+}
+```
 
+### 121. How can you implement authentication and authorization in ASP.NET Core Web API?
+```
    - Use authentication middleware like JWT (JSON Web Tokens), OAuth, or OpenID Connect to authenticate users.
    - Implement authorization using attributes like `[Authorize]` or custom authorization policies.
    - Configure authentication and authorization services in the `ConfigureServices` method of `Startup.cs`.
    - Use authentication schemes like cookies, JWT tokens, or external providers to handle authentication.
    - Define roles and permissions to control access to API endpoints.
+```
+```csharp
+// ConfigureServices method of Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+    // Authentication
+    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            // Configure JWT options
+        });
 
-122. What is the purpose of the `[AllowAnonymous]` attribute in ASP.NET Core Web API?
+    // Authorization
+    services.AddAuthorization(options =>
+    {
+        options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+    });
+}
 
+// Applying authorization to an action or controller
+[Authorize]
+[HttpGet("secure-data")]
+public IActionResult GetSecureData()
+{
+    // Action logic for authenticated users
+    return Ok();
+}
+```
+
+### 122. What is the purpose of the `[AllowAnonymous]` attribute in ASP.NET Core Web API?
+```
    - The `[AllowAnonymous]` attribute is used to allow unauthenticated access to a specific action or controller in ASP.NET Core Web API.
    - It overrides any authentication or authorization requirements for the annotated action or controller.
+```
+
+```csharp
+// Applying [AllowAnonymous] to allow unauthenticated access
+[AllowAnonymous]
+[HttpGet("public-data")]
+public IActionResult GetPublicData()
+{
+    // Action logic for unauthenticated users
+    return Ok();
+}
+```
 
 123. How can you handle errors and exceptions in ASP.NET Core Web API?
 
