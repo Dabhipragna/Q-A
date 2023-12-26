@@ -5865,113 +5865,232 @@ public IActionResult GetPublicData()
 ```
 
 123. How can you handle errors and exceptions in ASP.NET Core Web API?
-
+```
    - Use the built-in exception handling middleware provided by ASP.NET Core.
    - Configure exception handling in the `Configure` method of `Startup.cs` using the `UseExceptionHandler` or `UseDeveloperExceptionPage` methods.
    - Implement custom exception filters or middleware to handle specific exceptions.
    - Return appropriate error responses with relevant error details and HTTP status codes.
+```
+```csharp
+// Configure method of Startup.cs
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    if (env.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
+    }
+    else
+    {
+        app.UseExceptionHandler("/Home/Error");
+        app.UseHsts();
+    }
+
+    // other configurations
+}
+```
 
 124. How can you implement caching in ASP.NET Core Web API?
-
+```
    - Use the `ResponseCache` attribute to apply caching to specific actions or controllers.
    - Configure response caching in the `ConfigureServices` method of `Startup.cs`.
    - Use caching mechanisms like in-memory caching, distributed caching, or Redis cache.
    - Implement cache profiles to define caching behavior for different scenarios.
+```
+```csharp
+// Applying ResponseCache attribute to an action
+[HttpGet("cached-data")]
+[ResponseCache(Duration = 60)] // Cache for 60 seconds
+public IActionResult GetCachedData()
+{
+    // Action logic
+    return Ok();
+}
+```
 
 125. What is the purpose of the `[Produces]` attribute in ASP.NET Core Web API?
-
+```
    - The `[Produces]` attribute is used to specify the content types that an action method can produce in ASP.NET Core Web API.
    - It helps in content negotiation and allows the client to request a specific content type.
    - The `[Produces]` attribute can be applied at the action or controller level.
+```
+```csharp
+// Applying Produces attribute at the controller level
+[Produces("application/json", "application/xml")]
+[Route("api/[controller]")]
+public class SampleController : ControllerBase
+{
+    // Actions
+}
+```
 
 126. How can you implement rate limiting in ASP.NET Core Web API?
-
+```
    - Use third-party libraries like `AspNetCoreRateLimit` or `AspNetCore.RateLimit` to implement rate limiting.
    - Configure rate limiting options in the `ConfigureServices` method of `Startup.cs`.
    - Apply rate limiting middleware to specific routes or controllers.
    - Define rate limit rules based on IP address, client ID, or other criteria.
+```
+```csharp
+// ConfigureServices method of Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMemoryCache();
+    services.ConfigureRateLimiting();
+}
+
+// Applying rate limiting middleware
+[HttpGet("limited-data"), MiddlewareFilter(typeof(RateLimitMiddleware))]
+public IActionResult GetLimitedData()
+{
+    // Action logic
+    return Ok();
+}
+```
 
 127. How can you handle file uploads in ASP.NET Core Web API?
-
+```
    - Use the `[FromForm]` attribute to bind uploaded files to action method parameters.
    - Configure file upload options in the `ConfigureServices` method of `Startup.cs`.
    - Use the `IFormFile` interface to access and process uploaded files.
    - Implement file size restrictions, file type validation, and storage mechanisms as per requirements.
+```
+```csharp
+// Action method with file upload
+[HttpPost("upload")]
+public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
+{
+    // Process the uploaded file
+    return Ok();
+}
+```
 
 128. What is the purpose of the `[ProducesResponseType]` attribute in ASP.NET Core Web API?
-
+```
    - The `[ProducesResponseType]` attribute is used to specify the expected HTTP status codes and response types of an action method in ASP.NET Core Web API.
    - It helps in documenting the API and provides hints to the client about the expected response.
+```
+```csharp
+// Applying ProducesResponseType attribute to an action
+[ProducesResponseType(StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
+[HttpGet("{id}")]
+public IActionResult GetItem(int id)
+{
+    // Action logic
+    return Ok();
+}
+```
 
 129. How can you implement pagination in ASP.NET Core Web API?
+```
 
    - Use the `Skip` and `Take` LINQ methods to perform pagination on the data source.
    - Accept pagination parameters in the query string or request body to control the page size and page number.
    - Return paginated results along with metadata like total count, current page, and total pages.
+```
+```csharp
+// Action method with pagination
+[HttpGet("items")]
+public IActionResult GetItems(int page = 1, int pageSize = 10)
+{
+    var paginatedData = _repository.GetData().Skip((page - 1) * pageSize).Take(pageSize);
+    // Return paginatedData and metadata
+    return Ok(new { Data = paginatedData, Page = page, PageSize = pageSize, TotalItems = _repository.GetData().Count() });
+}
+```
 
 130. How can you implement background processing in ASP.NET Core Web API?
-
+```
    - Use the `BackgroundService` class provided by ASP.NET Core to implement long-running background tasks.
    - Register background services in the `ConfigureServices` method of `Startup.cs`.
    - Use third-party libraries like Hangfire or Quartz.NET for more advanced background processing scenarios.
+```
+```csharp
+// Background service implementation
+public class MyBackgroundService : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        // Background processing logic
+    }
+}
+```
 
+```csharp
+// ConfigureServices method of Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddHostedService<MyBackgroundService>();
+    // other configurations
+}
+```
 131. What is the purpose of the `[ApiController]` attribute in ASP.NET Core Web API?
-
+```
    - The `[ApiController]` attribute is used to enable several API-specific behaviors and conventions in ASP.NET Core Web API.
    - It includes automatic model validation, automatic HTTP 400 responses, and attribute routing.
    - The `[ApiController]` attribute can be applied at the controller level.
+```
 
 132. How can you implement request validation in ASP.NET Core Web API?
-
+```
    - Use model validation by applying validation attributes like `[Required]`, `[MaxLength]`, or custom validation attributes to model properties.
    - Use the `ModelState` object to check the validity of the request data in action methods.
    - Return appropriate error responses with validation details for invalid requests.
+```
 
 133. What is the purpose of the `[FromBody]` attribute in ASP.NET Core Web API?
-
+```
    - The `[FromBody]` attribute is used to bind complex types or values from the request body in ASP.NET Core Web API.
    - It helps in model binding and deserialization of request data.
+```
 
 134. How can you implement request logging in ASP.NET Core Web API?
-
+```
    - Use logging middleware like `UseSerilog` or `UseNLog` to capture and log request details.
    - Configure logging providers in the `ConfigureLogging` method of `Startup.cs`.
    - Log relevant information such as request method, URL, headers, and response status.
+```
 
 135. How can you implement data validation in ASP.NET Core Web API?
-
+```
    - Use model validation attributes like `[Required]`, `[Range]`, `[StringLength]`, or custom validation attributes to validate input data.
    - Implement validation logic in action methods using the `ModelState` object and return appropriate error responses.
    - Use FluentValidation or custom validation filters for more complex validation scenarios.
+```
 
 136. What is the purpose of the `[ValidateAntiForgeryToken]` attribute in ASP.NET Core Web API?
-
+```
    - The `[ValidateAntiForgeryToken]` attribute is used to prevent Cross-Site Request Forgery (CSRF) attacks in ASP.NET Core Web API.
    - It ensures that the request includes a valid anti-forgery token generated by the server.
+```
 
 137. How can you implement response compression in ASP.NET Core Web API?
-
+```
    - Use the `AddResponseCompression` method in the `ConfigureServices` method of `Startup.cs` to enable response compression.
    - Configure compression options like supported MIME types and compression level.
    - ASP.NET Core automatically compresses responses based on client preferences.
+```
 
 138. How can you implement request caching in ASP.NET Core Web API?
-
+```
    - Use the `ResponseCache` attribute or response caching middleware to cache responses at the server or client side.
    - Configure caching options in the `ConfigureServices` method of `Startup.cs`.
    - Specify cacheability and cache duration for specific actions or controllers.
+```
 
 139. What is the purpose of the `[Authorize]` attribute in ASP.NET Core Web API?
-
+```
    - The `[Authorize]` attribute is used to specify that an action or controller requires authentication in ASP.NET Core Web API.
    - It restricts access to authorized users and prevents anonymous access.
+```
 
 140. How can you implement request throttling in ASP.NET Core Web API?
-
+```
    - Use third-party libraries like `AspNetCoreRateLimit` or `AspNetCore.RateLimit` to implement request throttling.
    - Configure request throttling options in the `ConfigureServices` method of `Startup.cs`.
    - Apply request throttling middleware to specific routes or controllers.
    - Define request limit rules based on IP address, client ID, or other criteria.
+```
 
 141. How can you implement versioning in ASP.NET Core Web API?
 
